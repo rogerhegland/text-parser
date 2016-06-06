@@ -10,8 +10,7 @@
   "license": "Apache License 2.0",
   "authors": [
     {
-      "name": "Roger Hegland",
-      "email": "paquettg@gmail.com"
+      "name": "Roger Hegland"
     }
   ],
   "require": {
