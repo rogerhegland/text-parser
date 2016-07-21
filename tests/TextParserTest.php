@@ -30,7 +30,7 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function findOneWithTwoParametersReturnsTheTextBetweenTheFirstSearchtextAtTheEndAndTheLastSearchtextAtTheBeginning()
+    public function find_one_with_two_parameters_returns_the_text_between_the_first_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->setSimpleText();
         $expectedResult = "einfachen Link";
@@ -39,7 +39,7 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function findOneWithMultipleParametersReturnsTheTextBetweenTheSecondLastSearchtextAtTheEndAndTheLastSearchtextAtTheBeginning()
+    public function find_one_with_multiple_parameters_returns_the_text_between_the_second_last_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->setSimpleText();
         $expectedResult = "einfachen Link";
@@ -48,24 +48,22 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function findOneWithMultipleParametersThrowTextNotFoundExceptionWhenOneOfTheSearchtextsIsNotFound()
+    public function find_one_with_multiple_parameters_return_false_when_one_of_the_searchtexts_could_not_be_found()
     {
-        $this->expectException(TextNotFoundException::class);
-
         $text = $this->setSimpleText();
 
         // Suchtext vom ersten Parameter wird nicht gefunden
-        Parser::findOne($text, 'FindeMichNicht', "<a href=", "</a>");
+        $this->assertFalse(Parser::findOne($text, 'FindeMichNicht', "<a href=", "</a>"));
 
         // Suchtext von einem Parametern ausser dem ersten und letzten Parameter wird nicht gefunden
-        Parser::findOne($text, '<div', "FindeMichNicht?", '"', '">', "</a>");
+        $this->assertFalse(Parser::findOne($text, '<div', "FindeMichNicht?", '"', '">', "</a>"));
 
         // Suchtext vom letzten Parameter wird nicht gefunden
-        Parser::findOne($text, '<div', "<a href=", '"', '">', "FindeMichNicht");
+        $this->assertFalse(Parser::findOne($text, '<div', "<a href=", '"', '">', "FindeMichNicht"));
     }
 
     /** @test */
-    public function findManyWithTwoParametersReturnsTheTextsBetweenTheFirstSearchtextAtTheEndAndTheLastSearchtextAtTheBeginning()
+    public function findMany_with_two_parameters_returns_the_texts_between_the_first_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->setSimpleText();
 
@@ -77,7 +75,7 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function findManyWithMultipleParametersReturnsTheTextsBetweenTheSecondLastSearchtextAtTheEndAndTheLastSearchtextAtTheBeginning()
+    public function findMany_with_multiple_parameters_returns_the_texts_between_the_second_last_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->setSimpleText();
 
@@ -89,19 +87,17 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function findManyWithMultipleParametersThrowTextNotFoundExceptionWhenOneOfTheSearchtextsIsNotFound()
+    public function findMany_with_multiple_parameters_returns_an_empty_array_when_one_of_the_searchtexts_could_not_be_found()
     {
-        $this->expectException(TextNotFoundException::class);
-
         $text = $this->setSimpleText();
 
         // Suchtext vom ersten Parameter wird nicht gefunden
-        Parser::findMany($text, '</a>', 'FindeMichNicht', '<a href=');
+        $this->assertEquals([ ], Parser::findMany($text, '</a>', 'FindeMichNicht', '<a href='));
 
         // Suchtext von einem Parametern ausser dem ersten und letzten Parameter wird nicht gefunden
-        Parser::findMany($text, '</a>', '<div', 'FindeMichNicht?', '"', '">');
+        $this->assertEquals([ ], Parser::findMany($text, '</a>', '<div', 'FindeMichNicht?', '"', '">'));
 
         // Suchtext vom letzten Parameter wird nicht gefunden
-        Parser::findMany($text, 'FindeMichNicht', '<div', '<a href=', '"', '">');
+        $this->assertEquals([ ], Parser::findMany($text, 'FindeMichNicht', '<div', '<a href=', '"', '">'));
     }
 }
