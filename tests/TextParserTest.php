@@ -25,6 +25,10 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
 					        <li><a href="http://www.duckduckgo.com">DuckDuckGo</a></li>
                         </ul>
                     </div>
+                    <div class="empty"></div>
+                    <div class="empty"></div>
+                    <div class="empty"></div>
+                    <div id="empty"></div>
 				</div>
 				';
     }
@@ -82,8 +86,14 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
         // Ein Text
         $this->assertEquals([ 'einfachen Link', 'Bing Schweiz' ], Parser::findMany($text, '</a>', 'http', '.bing.ch">'));
 
+        // Ein Text, jedoch leer
+        $this->assertEquals([ '' ], Parser::findMany($text, '</div>', '<div id="empty">'));
+
         // Mehrere Texte
         $this->assertEquals([ 'http://www.bing.ch', 'http://www.google.ch', 'http://www.duckduckgo.com' ], Parser::findMany($text, '">', '<li>', '<a href="'));
+
+        // Mehrere Text, jedoch leere
+        $this->assertEquals([ '', '', '' ], Parser::findMany($text, '</div>', '<div class="empty">'));
     }
 
     /** @test */

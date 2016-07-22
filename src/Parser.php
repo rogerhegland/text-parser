@@ -48,13 +48,14 @@ class Parser
         $findOneParameters[] = $text;
         $findOneParameters = array_merge($findOneParameters, $searchTexts);
         $findOneParameters[] = $endText;
-        while ($found = call_user_func_array([ self::class, 'findOne' ], $findOneParameters)) {
+        while (( $found = call_user_func_array([ self::class, 'findOne' ], $findOneParameters) ) !== false) {
             $foundTexts[] = $found;
 
             foreach ($searchTexts as $searchText) {
                 $text = substr_replace($text, '', strpos($text, $searchText), strlen($searchText));
             }
-            $text = substr_replace($text, '', strpos($text, $found), strlen($found));
+
+            $text = $found !== '' ? substr_replace($text, '', strpos($text, $found), strlen($found)) : $text;
             $text = substr_replace($text, '', strpos($text, $endText), strlen($endText));
 
             $findOneParameters[0] = $text;
