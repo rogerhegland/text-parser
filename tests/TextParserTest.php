@@ -2,12 +2,11 @@
 
 namespace TextParser\Tests;
 
-use TextParser\Exceptions\TextNotFoundException;
 use TextParser\Parser;
 
 class TextParserTest extends \PHPUnit_Framework_TestCase
 {
-    private function setSimpleText()
+    private function getSimpleText()
     {
         return
             '
@@ -30,13 +29,23 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
                     <div class="empty"></div>
                     <div id="empty"></div>
 				</div>
+
+
+<span class="text-warning">
+I am an error.
+</span>
+
+
+<span class="text-warning">
+I am an error.
+</span>
 				';
     }
 
     /** @test */
     public function find_one_with_two_parameters_returns_the_text_between_the_first_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
-        $text = $this->setSimpleText();
+        $text = $this->getSimpleText();
         $expectedResult = "einfachen Link";
 
         $this->assertEquals($expectedResult, Parser::findOne($text, 'ng.ch">', "</a>"));
@@ -45,7 +54,7 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function find_one_with_multiple_parameters_returns_the_text_between_the_second_last_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
-        $text = $this->setSimpleText();
+        $text = $this->getSimpleText();
         $expectedResult = "einfachen Link";
 
         $this->assertEquals($expectedResult, Parser::findOne($text, '<div', "<a href=", '"', '">', "</a>"));
@@ -54,7 +63,7 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function find_one_with_multiple_parameters_return_false_when_one_of_the_searchtexts_could_not_be_found()
     {
-        $text = $this->setSimpleText();
+        $text = $this->getSimpleText();
 
         // Suchtext vom ersten Parameter wird nicht gefunden
         $this->assertFalse(Parser::findOne($text, 'FindeMichNicht', "<a href=", "</a>"));
@@ -67,9 +76,46 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function find_one_with_linebreak()
+    {
+        $text = $this->getSimpleText();
+        $expectedResult = '<span class="text-warning">
+I am an error.
+';
+
+        $search = '</div>
+
+
+';
+        $this->assertEquals($expectedResult, Parser::findOne($text, $search, '</span>'));
+        $this->assertEquals($expectedResult, Parser::findOne($text, '</div>'.PHP_EOL.PHP_EOL.PHP_EOL, '</span>'));
+    }
+
+    /** @test */
+    public function find_many_with_linebreak()
+    {
+        $text = $this->getSimpleText();
+        $expectedResult = [
+            '<span class="text-warning">
+I am an error.
+',
+            '<span class="text-warning">
+I am an error.
+'
+        ];
+
+        $search = '
+
+
+';
+
+        $this->assertEquals($expectedResult, Parser::findMany($text, '</span>', $search));
+    }
+
+    /** @test */
     public function findMany_with_two_parameters_returns_the_texts_between_the_first_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
-        $text = $this->setSimpleText();
+        $text = $this->getSimpleText();
 
         // Ein Text
         $this->assertEquals([ 'einfachen Link', 'Bing Schweiz' ], Parser::findMany($text, '</a>', '.bing.ch">'));
@@ -81,7 +127,7 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function findMany_with_multiple_parameters_returns_the_texts_between_the_second_last_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
-        $text = $this->setSimpleText();
+        $text = $this->getSimpleText();
 
         // Ein Text
         $this->assertEquals([ 'einfachen Link', 'Bing Schweiz' ], Parser::findMany($text, '</a>', 'http', '.bing.ch">'));
@@ -99,15 +145,15 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function findMany_with_multiple_parameters_returns_an_empty_array_when_one_of_the_searchtexts_could_not_be_found()
     {
-        $text = $this->setSimpleText();
+        $text = $this->getSimpleText();
 
         // Suchtext vom ersten Parameter wird nicht gefunden
-        $this->assertEquals([ ], Parser::findMany($text, '</a>', 'FindeMichNicht', '<a href='));
+        $this->assertEquals([], Parser::findMany($text, '</a>', 'FindeMichNicht', '<a href='));
 
         // Suchtext von einem Parametern ausser dem ersten und letzten Parameter wird nicht gefunden
-        $this->assertEquals([ ], Parser::findMany($text, '</a>', '<div', 'FindeMichNicht?', '"', '">'));
+        $this->assertEquals([], Parser::findMany($text, '</a>', '<div', 'FindeMichNicht?', '"', '">'));
 
         // Suchtext vom letzten Parameter wird nicht gefunden
-        $this->assertEquals([ ], Parser::findMany($text, 'FindeMichNicht', '<div', '<a href=', '"', '">'));
+        $this->assertEquals([], Parser::findMany($text, 'FindeMichNicht', '<div', '<a href=', '"', '">'));
     }
 }
