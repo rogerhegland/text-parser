@@ -43,7 +43,7 @@ I am an error.
     }
 
     /** @test */
-    public function find_one_with_two_parameters_returns_the_text_between_the_first_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
+    public function findOne_with_two_parameters_returns_the_text_between_the_first_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->getSimpleText();
         $expectedResult = "einfachen Link";
@@ -52,7 +52,7 @@ I am an error.
     }
 
     /** @test */
-    public function find_one_with_multiple_parameters_returns_the_text_between_the_second_last_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
+    public function findOne_with_multiple_parameters_returns_the_text_between_the_second_last_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->getSimpleText();
         $expectedResult = "einfachen Link";
@@ -61,7 +61,7 @@ I am an error.
     }
 
     /** @test */
-    public function find_one_with_multiple_parameters_return_false_when_one_of_the_searchtexts_could_not_be_found()
+    public function findOne_with_multiple_parameters_return_false_when_one_of_the_searchtexts_could_not_be_found()
     {
         $text = $this->getSimpleText();
 
@@ -76,7 +76,7 @@ I am an error.
     }
 
     /** @test */
-    public function find_one_with_linebreak()
+    public function findOne_with_linebreak()
     {
         $text = $this->getSimpleText();
         $expectedResult = '<span class="text-warning">
@@ -92,7 +92,15 @@ I am an error.
     }
 
     /** @test */
-    public function find_many_with_linebreak()
+    public function findOne_with_empty_needle()
+    {
+        $text = $this->getSimpleText();
+
+        $this->assertFalse(Parser::findOne($text, ''));
+    }
+
+    /** @test */
+    public function findMany_with_linebreak()
     {
         $text = $this->getSimpleText();
         $expectedResult = [
@@ -155,5 +163,20 @@ I am an error.
 
         // Suchtext vom letzten Parameter wird nicht gefunden
         $this->assertEquals([], Parser::findMany($text, 'FindeMichNicht', '<div', '<a href=', '"', '">'));
+    }
+
+    /** @test */
+    public function findMany_with_oneOrMore_empty_needles_returns_an_empty_array()
+    {
+        $text = $this->getSimpleText();
+
+        $this->assertEquals([], Parser::findMany($text, '>', ''));
+        $this->assertEquals([], Parser::findMany($text, '', '>'));
+        $this->assertEquals([], Parser::findMany($text, '', '', '>'));
+        $this->assertEquals([], Parser::findMany($text, '', '>', '>'));
+        $this->assertEquals([], Parser::findMany($text, '>', '>', ''));
+        $this->assertEquals([], Parser::findMany($text, '>', '', '>'));
+        $this->assertEquals([], Parser::findMany($text, '', ''));
+        $this->assertEquals([], Parser::findMany($text, '', '', ''));
     }
 }

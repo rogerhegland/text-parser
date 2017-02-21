@@ -12,9 +12,15 @@ class Parser
      */
     public static function findOne($text, ...$searchTexts)
     {
+        foreach ($searchTexts as $searchText) {
+            if ( ! $searchText) {
+                return false;
+            }
+        }
+
         $numberOfSearchTexts = count($searchTexts);
         $index = 0;
-        while (isset( $searchTexts[$index] )) {
+        while (isset($searchTexts[$index])) {
             $searchText = $searchTexts[$index];
             $lastParameter = $numberOfSearchTexts - 1 == $index;
 
@@ -44,7 +50,7 @@ class Parser
      */
     public static function findMany($text, $endText, ...$searchTexts)
     {
-        $foundTexts = [ ];
+        $foundTexts = [];
         $findOneParameters[] = $text;
         $findOneParameters = array_merge($findOneParameters, $searchTexts);
         $findOneParameters[] = $endText;
