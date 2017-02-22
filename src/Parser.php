@@ -24,15 +24,15 @@ class Parser
             $searchText = $searchTexts[$index];
             $lastParameter = $numberOfSearchTexts - 1 == $index;
 
-            $strposResult = strpos($text, $searchText);
-            if ($strposResult === false) {
+            $striposResult = stripos($text, $searchText);
+            if ($striposResult === false) {
                 return false;
             }
 
             if ($lastParameter) {
-                $text = substr($text, 0, $strposResult);
+                $text = substr($text, 0, $striposResult);
             } else {
-                $text = substr($text, $strposResult + strlen($searchText));
+                $text = substr($text, $striposResult + strlen($searchText));
             }
 
             $index++;
@@ -58,11 +58,11 @@ class Parser
             $foundTexts[] = $found;
 
             foreach ($searchTexts as $searchText) {
-                $text = substr_replace($text, '', strpos($text, $searchText), strlen($searchText));
+                $text = substr_replace($text, '', stripos($text, $searchText), strlen($searchText));
             }
 
-            $text = $found !== '' ? substr_replace($text, '', strpos($text, $found), strlen($found)) : $text;
-            $text = substr_replace($text, '', strpos($text, $endText), strlen($endText));
+            $text = $found !== '' ? substr_replace($text, '', stripos($text, $found), strlen($found)) : $text;
+            $text = substr_replace($text, '', stripos($text, $endText), strlen($endText));
 
             $findOneParameters[0] = $text;
         }

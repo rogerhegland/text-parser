@@ -29,6 +29,11 @@ class TextParserTest extends \PHPUnit_Framework_TestCase
                     <div class="empty"></div>
                     <div id="empty"></div>
 				</div>
+				
+				<div class="text-uppercase">
+				    <SPAN class="UPPERCASE">UPPERCASE TEXT</SPAN>
+				    <SPAN class="UPPERCASE">UPPERCASE TEXT</SPAN>
+                </div>
 
 
 <span class="text-warning">
@@ -46,18 +51,18 @@ I am an error.
     public function findOne_with_two_parameters_returns_the_text_between_the_first_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->getSimpleText();
-        $expectedResult = "einfachen Link";
+        $expected = "einfachen Link";
 
-        $this->assertEquals($expectedResult, Parser::findOne($text, 'ng.ch">', "</a>"));
+        $this->assertEquals($expected, Parser::findOne($text, 'ng.ch">', "</a>"));
     }
 
     /** @test */
     public function findOne_with_multiple_parameters_returns_the_text_between_the_second_last_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->getSimpleText();
-        $expectedResult = "einfachen Link";
+        $expected = "einfachen Link";
 
-        $this->assertEquals($expectedResult, Parser::findOne($text, '<div', "<a href=", '"', '">', "</a>"));
+        $this->assertEquals($expected, Parser::findOne($text, '<div', "<a href=", '"', '">', "</a>"));
     }
 
     /** @test */
@@ -76,19 +81,12 @@ I am an error.
     }
 
     /** @test */
-    public function findOne_with_linebreak()
+    public function findOne_is_caseinsensitive()
     {
         $text = $this->getSimpleText();
-        $expectedResult = '<span class="text-warning">
-I am an error.
-';
+        $expected = 'UPPERCASE TEXT';
 
-        $search = '</div>
-
-
-';
-        $this->assertEquals($expectedResult, Parser::findOne($text, $search, '</span>'));
-        $this->assertEquals($expectedResult, Parser::findOne($text, '</div>'.PHP_EOL.PHP_EOL.PHP_EOL, '</span>'));
+        $this->assertEquals($expected, Parser::findOne($text, '<span class="uppercase">', '</span>'));
     }
 
     /** @test */
@@ -100,24 +98,19 @@ I am an error.
     }
 
     /** @test */
-    public function findMany_with_linebreak()
+    public function findOne_with_linebreak()
     {
         $text = $this->getSimpleText();
-        $expectedResult = [
-            '<span class="text-warning">
+        $expected = '<span class="text-warning">
 I am an error.
-',
-            '<span class="text-warning">
-I am an error.
-'
-        ];
+';
 
-        $search = '
+        $search = '</div>
 
 
 ';
-
-        $this->assertEquals($expectedResult, Parser::findMany($text, '</span>', $search));
+        $this->assertEquals($expected, Parser::findOne($text, $search, '</span>'));
+        $this->assertEquals($expected, Parser::findOne($text, '</div>'.PHP_EOL.PHP_EOL.PHP_EOL, '</span>'));
     }
 
     /** @test */
@@ -166,6 +159,15 @@ I am an error.
     }
 
     /** @test */
+    public function findMany_is_caseinsensitive()
+    {
+        $text = $this->getSimpleText();
+        $expected = [ 'UPPERCASE TEXT', 'UPPERCASE TEXT' ];
+
+        $this->assertEquals($expected, Parser::findMany($text, '</span>', '<span class="uppercase">'));
+    }
+
+    /** @test */
     public function findMany_with_oneOrMore_empty_needles_returns_an_empty_array()
     {
         $text = $this->getSimpleText();
@@ -178,5 +180,26 @@ I am an error.
         $this->assertEquals([], Parser::findMany($text, '>', '', '>'));
         $this->assertEquals([], Parser::findMany($text, '', ''));
         $this->assertEquals([], Parser::findMany($text, '', '', ''));
+    }
+
+    /** @test */
+    public function findMany_with_linebreak()
+    {
+        $text = $this->getSimpleText();
+        $expected = [
+            '<span class="text-warning">
+I am an error.
+',
+            '<span class="text-warning">
+I am an error.
+'
+        ];
+
+        $search = '
+
+
+';
+
+        $this->assertEquals($expected, Parser::findMany($text, '</span>', $search));
     }
 }
