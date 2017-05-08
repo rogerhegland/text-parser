@@ -12,19 +12,25 @@ class Parser
      */
     public static function findOne($text, ...$searchTexts)
     {
+        $numberOfSearchTexts = count($searchTexts);
+
+        $checkedSearchTexts = 0;
         foreach ($searchTexts as $searchText) {
-            if ( ! $searchText) {
+            $checkedSearchTexts++;
+            // the last searchtext can be an empty string - all others must have an value
+            if ( ! $searchText && $numberOfSearchTexts != $checkedSearchTexts) {
                 return false;
             }
         }
 
-        $numberOfSearchTexts = count($searchTexts);
         $index = 0;
         while (isset($searchTexts[$index])) {
             $searchText = $searchTexts[$index];
             $lastParameter = $numberOfSearchTexts - 1 == $index;
 
-            $striposResult = stripos($text, $searchText);
+            $striposResult = ( $index + 1 == $numberOfSearchTexts && $searchText === '' )
+                ? strlen($text)
+                : stripos($text, $searchText);
             if ($striposResult === false) {
                 return false;
             }
@@ -50,6 +56,10 @@ class Parser
      */
     public static function findMany($text, $endText, ...$searchTexts)
     {
+        if ( ! $endText) {
+            return [];
+        }
+
         $foundTexts = [];
         $findOneParameters[] = $text;
         $findOneParameters = array_merge($findOneParameters, $searchTexts);

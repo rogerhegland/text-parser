@@ -57,6 +57,15 @@ I am an error.
     }
 
     /** @test */
+    public function find_one_with_two_parameters_where_the_last_parameter_is_empty_returns_the_text_from_beginnging_of_the_first_occurences_to_the_end_of_the_text()
+    {
+        $text = 'Hi, my name is -Roger Hegland';
+        $expected = 'Roger Hegland';
+
+        $this->assertEquals($expected, Parser::findOne($text, '-', ''));
+    }
+
+    /** @test */
     public function findOne_with_two_parameters_returns_the_text_between_the_first_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->getSimpleText();
@@ -103,7 +112,16 @@ I am an error.
     {
         $text = $this->getSimpleText();
 
-        $this->assertFalse(Parser::findOne($text, ''));
+        // empty needle on the last position -> OK
+        $this->assertEquals($text, Parser::findOne($text, ''));
+        $this->assertEquals('
+I am an error.
+</span>
+				', Parser::findOne($text, '<span class="text-warning">', '<span class="text-warning">', ''));
+
+        // empty needle not on the last position -> NOT OK
+        $this->assertFalse(Parser::findOne($text, '</span>', '', '<'));
+        $this->assertFalse(Parser::findOne($text, '</span>', '', ''));
     }
 
     /** @test */
