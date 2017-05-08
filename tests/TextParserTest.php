@@ -48,6 +48,15 @@ I am an error.
     }
 
     /** @test */
+    public function findOne_with_one_parameter_returns_the_text_from_beginning_of_the_text_to_the_first_occurence_of_the_searchtext()
+    {
+        $text = '<strong>this is a important text</strong>';
+        $expected = '<strong';
+
+        $this->assertEquals($expected, Parser::findOne($text, '>'));
+    }
+
+    /** @test */
     public function findOne_with_two_parameters_returns_the_text_between_the_first_searchtext_at_the_end_and_the_last_searchtext_at_the_beginning()
     {
         $text = $this->getSimpleText();
