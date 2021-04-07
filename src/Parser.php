@@ -6,7 +6,7 @@ class Parser
 {
     /**
      * @param string $text
-     * @param array  ...$searchTexts
+     * @param string  ...$searchTexts
      *
      * @return string|bool
      */
@@ -50,7 +50,7 @@ class Parser
     /**
      * @param string $text
      * @param string $endText
-     * @param array  ...$searchTexts
+     * @param string  ...$searchTexts
      *
      * @return array
      */
