@@ -1,7 +1,6 @@
 {
   "name": "hegland/text-parser",
   "type": "library",
-  "version": "2.0.1",
   "description": "A Text parser. It allows you to cut out the needed part of a text from a given text.",
   "keywords": [
     "parser"
