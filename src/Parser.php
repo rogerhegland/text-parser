@@ -6,11 +6,11 @@ class Parser
 {
     /**
      * @param string $text
-     * @param string  ...$searchTexts
+     * @param string ...$searchTexts
      *
      * @return string|bool
      */
-    public static function findOne($text, ...$searchTexts)
+    public static function findOne(string $text, ...$searchTexts): bool|string
     {
         $numberOfSearchTexts = count($searchTexts);
 
@@ -50,11 +50,11 @@ class Parser
     /**
      * @param string $text
      * @param string $endText
-     * @param string  ...$searchTexts
+     * @param string ...$searchTexts
      *
      * @return array
      */
-    public static function findMany($text, $endText, ...$searchTexts)
+    public static function findMany(string $text, string $endText, ...$searchTexts): array
     {
         if ( ! $endText) {
             return [];

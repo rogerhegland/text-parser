@@ -2,11 +2,12 @@
 
 namespace TextParser\Tests;
 
+use PHPUnit\Framework\TestCase;
 use TextParser\Parser;
 
-class TextParserTest extends \PHPUnit_Framework_TestCase
+class TextParserTest extends TestCase
 {
-    private function getSimpleText()
+    private function getSimpleText(): string
     {
         return
             '

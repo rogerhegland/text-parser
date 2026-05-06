@@ -2,7 +2,7 @@
 <phpunit bootstrap="./tests/bootstrap.php"
          colors="true">
     <testsuites>
-        <testsuite>
+        <testsuite name="Text Parser Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
