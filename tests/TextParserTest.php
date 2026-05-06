@@ -35,6 +35,10 @@ class TextParserTest extends TestCase
 				    <SPAN class="UPPERCASE">UPPERCASE TEXT</SPAN>
 				    <SPAN class="UPPERCASE">UPPERCASE TEXT</SPAN>
                 </div>
+                
+                <script>
+                    let settings = [{value:"6.0",label:"Zimmer"},{value:"125",label:"Wohnflaeche"},{value:"2025",label:"Baujahr"}];
+                </script>
 
 
 <span class="text-warning">
@@ -73,6 +77,7 @@ I am an error.
         $expected = "einfachen Link";
 
         $this->assertEquals($expected, Parser::findOne($text, 'ng.ch">', "</a>"));
+        $this->assertEquals($expected, Parser::fO($text, 'ng.ch">', "</a>"));
     }
 
     /** @test */
@@ -128,17 +133,66 @@ I am an error.
     /** @test */
     public function findOne_with_linebreak()
     {
-        $text = $this->getSimpleText();
-        $expected = '<span class="text-warning">
-I am an error.
-';
+        $expected = '<span class="text-warning">'.PHP_EOL.'I am an error.'.PHP_EOL;
+        $text = '<div>content</div>'.PHP_EOL.PHP_EOL.PHP_EOL.$expected.'</span>';
 
-        $search = '</div>
-
-
-';
+        $search = '</div>'.PHP_EOL.PHP_EOL.PHP_EOL;
         $this->assertEquals($expected, Parser::findOne($text, $search, '</span>'));
-        $this->assertEquals($expected, Parser::findOne($text, '</div>'.PHP_EOL.PHP_EOL.PHP_EOL, '</span>'));
+    }
+
+    /** @test */
+    public function bFindOne_returns_the_text_between_the_previous_searchtext_and_the_anchor()
+    {
+        $text = $this->getSimpleText();
+
+        $this->assertEquals('6.0', Parser::findOneBackwards($text, '",label:"Zimmer"', '"'));
+        $this->assertEquals('6.0', Parser::bFindOne($text, '",label:"Zimmer"', '"'));
+        $this->assertEquals('6.0', Parser::bfO($text, '",label:"Zimmer"', '"'));
+    }
+
+    /** @test */
+    public function findOneBackwards_is_caseinsensitive()
+    {
+        $text = $this->getSimpleText();
+
+        $this->assertEquals('6.0', Parser::findOneBackwards($text, '",LABEL:"ZIMMER"', '"'));
+    }
+
+    /** @test */
+    public function findOneBackwards_can_search_backwards_over_multiple_markers()
+    {
+        $text = $this->getSimpleText();
+
+        $this->assertEquals(
+            '6.0',
+            Parser::findOneBackwards($text, ',label:"Wohnflaeche"', 'label:"Zimmer"', '"', '"')
+        );
+    }
+
+    /** @test */
+    public function findOneBackwards_returns_false_when_a_backwards_searchtext_could_not_be_found()
+    {
+        $text = 'value:6.0",label:"Zimmer"';
+
+        $this->assertFalse(Parser::findOneBackwards($text, '",label:"Zimmer"', '"'));
+    }
+
+    /** @test */
+    public function findOneBackwards_returns_false_when_less_than_two_searchtexts_are_given()
+    {
+        $text = 'value:"6.0",label:"Zimmer"';
+
+        $this->assertFalse(Parser::findOneBackwards($text));
+        $this->assertFalse(Parser::findOneBackwards($text, '",label:"Zimmer"'));
+    }
+
+    /** @test */
+    public function findOneBackwards_returns_false_when_a_searchtext_is_empty()
+    {
+        $text = 'value:"6.0",label:"Zimmer"';
+
+        $this->assertFalse(Parser::findOneBackwards($text, '",label:"Zimmer"', ''));
+        $this->assertFalse(Parser::findOneBackwards($text, '', '"'));
     }
 
     /** @test */
@@ -148,6 +202,7 @@ I am an error.
 
         // Ein Text
         $this->assertEquals([ 'einfachen Link', 'Bing Schweiz' ], Parser::findMany($text, '</a>', '.bing.ch">'));
+        $this->assertEquals([ 'einfachen Link', 'Bing Schweiz' ], Parser::fM($text, '</a>', '.bing.ch">'));
 
         // Mehrere Texte
         $this->assertEquals([ 'http://www.bing.ch', 'http://www.bing.ch', 'http://www.google.ch', 'http://www.duckduckgo.com' ], Parser::findMany($text, '">', '<a href="'));
@@ -184,6 +239,14 @@ I am an error.
 
         // Suchtext vom letzten Parameter wird nicht gefunden
         $this->assertEquals([], Parser::findMany($text, 'FindeMichNicht', '<div', '<a href=', '"', '">'));
+    }
+
+    /** @test */
+    public function findMany_moves_to_the_end_of_the_current_match_before_searching_again()
+    {
+        $text = 'prefix <span>prefix</span> prefix <span>prefix</span>';
+
+        $this->assertEquals([ 'prefix', 'prefix' ], Parser::findMany($text, '</span>', '<span>'));
     }
 
     /** @test */

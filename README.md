@@ -67,6 +67,35 @@ result = (string) 'Roger Hegland'
 */
 ```
 
+### Find one backwards
+
+Use `findOneBackwards()` when you know the text on the right side and want to search backwards for the left boundary.
+The first search text is the right anchor. Each following search text is searched backwards from the start of the current match.
+
+```php
+$text = '<script>
+    let settings = [{value:"6.0",label:"Zimmer"},{value:"125",label:"Wohnflaeche"},{value:"2025",label:"Baujahr"}];
+</script>';
+
+$rooms = Parser::findOneBackwards($text, '",label:"Zimmer"', '"');
+
+/*
+result = (string) '6.0'
+*/
+```
+
+`bFindOne()` is available as a short alias for `findOneBackwards()`.
+
+### Aliases
+
+The descriptive method names are the primary API. Short aliases are available for compact parser calls:
+
+```php
+Parser::fO($text, '<td>', '</td>'); // findOne()
+Parser::fM($text, '</a>', '<li>', '">'); // findMany()
+Parser::bfO($text, '",label:"Zimmer"', '"'); // findOneBackwards()
+```
+
 ### Find many
 
 Please notice, that the first parameter is used for the end search.
