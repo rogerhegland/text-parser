@@ -170,6 +170,32 @@ I am an error.
     }
 
     /** @test */
+    public function findOneBackwards_starts_at_the_last_anchor_when_the_anchor_occurs_multiple_times()
+    {
+        $breadcrumbs = '
+            <ul class="breadcrumbs" itemscope itemtype="https://schema.org/BreadcrumbList">
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <a itemprop="item" href="/">
+                        <span itemprop="name">Quoka</span>
+                    </a>
+                    <meta itemprop="position" content="1" />
+                </li>
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <a itemprop="item" href="/anzeigen/immobilienmarkt/immobilien/bauernhaeuser-hoefe-gueter/">
+                        <span itemprop="name">Bauernh&#228;user, H&#246;fe, G&#252;ter</span>
+                    </a>
+                    <meta itemprop="position" content="5" />
+                </li>
+            </ul>
+        ';
+
+        $this->assertEquals(
+            'Bauernh&#228;user, H&#246;fe, G&#252;ter',
+            Parser::bFindOne($breadcrumbs, '<meta itemprop="position"', '</span>', '">')
+        );
+    }
+
+    /** @test */
     public function findOneBackwards_returns_false_when_a_backwards_searchtext_could_not_be_found()
     {
         $text = 'value:6.0",label:"Zimmer"';

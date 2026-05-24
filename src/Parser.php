@@ -104,9 +104,7 @@ class Parser
             $searchText = $searchTexts[$index];
             $lastParameter = $numberOfSearchTexts - 1 == $index;
 
-            $striposResult = $index === 0
-                ? stripos($text, $searchText)
-                : strripos($text, $searchText);
+            $striposResult = strripos($text, $searchText);
             if ($striposResult === false) {
                 return false;
             }
